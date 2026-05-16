@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: mediagram-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mediagram
+      POSTGRES_PASSWORD: mediagram123
+      POSTGRES_DB: mediagram
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - docker_postgre
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mediagram -d mediagram"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: mediagram-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mediagram.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - docker_postgre
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  docker_postgre:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pgadmin_data:
