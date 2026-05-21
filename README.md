@@ -1,6 +1,11 @@
 # MediaGram
+live: https://media-gram-ten.vercel.app/
 
 MediaGram là mạng xã hội full-stack với feed bài viết, like, comment, follow, chat realtime, thông báo và profile cá nhân.
+Deploy sử dụng: 
+- backend: Render
+- database: supabase
+- frontend: vercel
 
 ## Tính năng
 
