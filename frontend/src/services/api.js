@@ -30,6 +30,13 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const requestUrl = originalRequest?.url || "";
+    const isAuthRoute = requestUrl.startsWith("/auth/");
+
+    // Auth endpoints should surface their own errors directly.
+    if (isAuthRoute) {
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
@@ -49,8 +56,6 @@ api.interceptors.response.use(
       const refreshToken = localStorage.getItem("refreshToken");
       if (!refreshToken) {
         isRefreshing = false;
-        localStorage.clear();
-        window.location.href = "/auth";
         return Promise.reject(error);
       }
 

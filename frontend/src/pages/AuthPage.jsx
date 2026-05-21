@@ -102,6 +102,7 @@ const AuthPage = () => {
               ].map((m) => (
                 <button
                   key={m.key}
+                  type="button"
                   onClick={() => setMode(m.key)}
                   className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold capitalize transition-all ${
                     mode === m.key ? "bg-brand-500 text-white" : "text-white/50 hover:text-white"
@@ -151,11 +152,6 @@ const AuthPage = () => {
                 {isLoading ? t("common.pleaseWait") : mode === "login" ? t("common.signIn") : t("common.createAccount")}
               </button>
             </form>
-
-            <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/55">
-              <p className="font-semibold text-white/75">{t("auth.demo")}</p>
-              <p className="mt-1">{t("auth.loginHint")}</p>
-            </div>
           </div>
         </motion.section>
       </div>

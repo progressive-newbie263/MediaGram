@@ -45,8 +45,6 @@ const translations = {
     },
     auth: {
       title: "Connect. Share. Explore.",
-      demo: "Demo account",
-      loginHint: "alice@example.com / password123",
       registerHint: "Create your account and start posting",
       heroTitle: "A cleaner, faster social space for sharing moments.",
       heroText: "Built for quick posting, smooth browsing and realtime conversation without visual clutter.",
@@ -138,8 +136,6 @@ const translations = {
     },
     auth: {
       title: "Kết nối. Chia sẻ. Khám phá.",
-      demo: "Tài khoản demo",
-      loginHint: "alice@example.com / password123",
       registerHint: "Tạo tài khoản và bắt đầu đăng bài",
       heroTitle: "Một không gian mạng xã hội gọn hơn, nhanh hơn để chia sẻ khoảnh khắc.",
       heroText: "Được thiết kế cho đăng bài nhanh, duyệt mượt và trò chuyện realtime mà không rối mắt.",

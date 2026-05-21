@@ -88,13 +88,13 @@ const login = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(404).json({ error: "Email does not exist" });
     }
 
     // Check password
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ error: "Incorrect password" });
     }
 
     // Generate tokens
