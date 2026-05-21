@@ -18,14 +18,18 @@ const useNotifStore = create((set, get) => ({
         unreadCount,
         page: page + 1,
       }));
-    } catch { }
+    } catch (error) {
+      void error;
+    }
   },
 
   fetchUnreadCount: async () => {
     try {
       const res = await notificationService.getUnreadCount();
       set({ unreadCount: res.data.count });
-    } catch { }
+    } catch (error) {
+      void error;
+    }
   },
 
   markAllRead: async () => {
@@ -35,7 +39,9 @@ const useNotifStore = create((set, get) => ({
         unreadCount: 0,
         notifications: state.notifications.map((n) => ({ ...n, read: true })),
       }));
-    } catch { }
+    } catch (error) {
+      void error;
+    }
   },
 
   addNotification: (notif) =>

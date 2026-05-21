@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import useAuthStore from "./store/authStore";
 import useSocket from "./hooks/useSocket";
 import useNotifStore from "./store/notifStore";
+import useSettingsStore from "./store/settingsStore";
 
 // Pages
 import AuthPage from "./pages/AuthPage";
@@ -13,6 +14,7 @@ import ExplorePage from "./pages/ExplorePage";
 import ChatPage from "./pages/ChatPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import PostDetailPage from "./pages/PostDetailPage";
+import SettingsPage from "./pages/SettingsPage";
 
 // Layout
 import MainLayout from "./components/layout/MainLayout";
@@ -26,7 +28,15 @@ const ProtectedRoute = ({ children }) => {
 const AppContent = () => {
   const { isAuthenticated, hydrateUser } = useAuthStore();
   const { fetchUnreadCount } = useNotifStore();
+  const { theme } = useSettingsStore();
   useSocket(); // init socket connection
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.theme = theme;
+    root.classList.toggle("theme-light", theme === "white");
+    root.classList.toggle("theme-blueblack", theme !== "white");
+  }, [theme]);
 
   useEffect(() => {
     hydrateUser();
@@ -54,6 +64,7 @@ const AppContent = () => {
         <Route path="notifications" element={<NotificationsPage />} />
         <Route path="profile/:username" element={<ProfilePage />} />
         <Route path="post/:postId" element={<PostDetailPage />} />
+        <Route path="settings" element={<SettingsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -67,13 +78,13 @@ const App = () => (
       position="bottom-right"
       toastOptions={{
         style: {
-          background: "#1e293b",
-          color: "#f1f5f9",
+          background: "#0b1220",
+          color: "#e2e8f0",
           border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: "12px",
           fontSize: "14px",
         },
-        success: { iconTheme: { primary: "#6366f1", secondary: "#fff" } },
+        success: { iconTheme: { primary: "#3b82f6", secondary: "#fff" } },
       }}
     />
   </BrowserRouter>

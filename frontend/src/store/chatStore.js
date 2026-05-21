@@ -1,6 +1,45 @@
 import { create } from "zustand";
 import { messageService } from "../services/message.service";
+import useAuthStore from "./authStore";
 import toast from "react-hot-toast";
+
+const mergeUniqueById = (existing = [], incoming = []) => {
+  const merged = [...existing, ...incoming];
+  return Array.from(new Map(merged.map((item) => [item.id, item])).values());
+};
+
+const mergeConversationList = (conversations = []) => {
+  const byParticipant = new Map();
+
+  for (const conversation of conversations) {
+    const participantId = conversation.participant?.id;
+    if (!participantId) continue;
+
+    const existing = byParticipant.get(participantId);
+    if (!existing) {
+      byParticipant.set(participantId, conversation);
+      continue;
+    }
+
+    const existingTime = new Date(existing.lastMessageAt || existing.lastMessage?.createdAt || existing.updatedAt || 0).getTime();
+    const currentTime = new Date(conversation.lastMessageAt || conversation.lastMessage?.createdAt || conversation.updatedAt || 0).getTime();
+
+    if (currentTime >= existingTime) {
+      byParticipant.set(participantId, conversation);
+    }
+  }
+
+  return Array.from(byParticipant.values()).sort((a, b) => {
+    const aTime = new Date(a.lastMessageAt || a.lastMessage?.createdAt || 0).getTime();
+    const bTime = new Date(b.lastMessageAt || b.lastMessage?.createdAt || 0).getTime();
+    return bTime - aTime;
+  });
+};
+
+const upsertToFrontById = (items = [], item) => {
+  if (!item) return items;
+  return [item, ...items.filter((current) => current.id !== item.id)];
+};
 
 const useChatStore = create((set, get) => ({
   conversations: [],
@@ -29,8 +68,10 @@ const useChatStore = create((set, get) => ({
   fetchConversations: async () => {
     try {
       const res = await messageService.getConversations();
-      set({ conversations: res.data.conversations });
-    } catch { }
+      set({ conversations: mergeConversationList(res.data.conversations) });
+    } catch (error) {
+      void error;
+    }
   },
 
   setActiveConversation: async (conversation) => {
@@ -47,10 +88,21 @@ const useChatStore = create((set, get) => ({
         .find((u) => u?.id === userId);
       const formatted = { id: conv.id, participant, lastMessage: null, unreadCount: 0 };
       set((state) => {
-        const exists = state.conversations.find((c) => c.id === conv.id);
+        const nextConversation = {
+          ...(state.conversations.find((c) => c.id === conv.id) || formatted),
+          participant: participant || state.conversations.find((c) => c.id === conv.id)?.participant || null,
+        };
+
+        const conversations = mergeConversationList([
+          nextConversation,
+          ...state.conversations.filter((c) => c.id !== conv.id),
+        ]);
+
+        const activeConversation = conversations.find((c) => c.id === nextConversation.id) || nextConversation;
+
         return {
-          conversations: exists ? state.conversations : [formatted, ...state.conversations],
-          activeConversation: formatted,
+          conversations,
+          activeConversation,
           messages: [],
           messagesPage: 1,
           hasMoreMessages: true,
@@ -70,11 +122,15 @@ const useChatStore = create((set, get) => ({
       const res = await messageService.getMessages(conversationId, page);
       const { messages, hasMore } = res.data;
       set((state) => ({
-        messages: loadMore ? [...messages, ...state.messages] : messages,
+        messages: loadMore
+          ? mergeUniqueById(messages, state.messages)
+          : mergeUniqueById([], messages),
         messagesPage: page + 1,
         hasMoreMessages: hasMore,
       }));
-    } catch { } finally {
+    } catch (error) {
+      void error;
+    } finally {
       set({ loadingMessages: false });
     }
   },
@@ -90,11 +146,13 @@ const useChatStore = create((set, get) => ({
       });
       const msg = res.data.message;
       set((state) => ({
-        messages: [...state.messages, msg],
-        conversations: state.conversations.map((c) =>
-          c.id === conv.id
-            ? { ...c, lastMessage: { content, createdAt: msg.createdAt } }
-            : c
+        messages: mergeUniqueById(state.messages, [msg]),
+        conversations: upsertToFrontById(
+          state.conversations,
+          {
+            ...(state.conversations.find((c) => c.id === conv.id) || conv),
+            lastMessage: { content: content || "📷 Image", createdAt: msg.createdAt },
+          }
         ),
       }));
     } catch {
@@ -105,18 +163,24 @@ const useChatStore = create((set, get) => ({
   // ── Real-time: receive message ────────────────────────────────
   receiveMessage: (message) => {
     const active = get().activeConversation;
+    const currentUserId = useAuthStore.getState()?.user?.id;
+    const isOwnMessage = currentUserId && message.senderId === currentUserId;
+
     if (active?.id === message.conversationId) {
-      set((state) => ({ messages: [...state.messages, message] }));
+      set((state) => ({
+        messages: mergeUniqueById(state.messages, [message]),
+      }));
     }
     set((state) => ({
-      conversations: state.conversations.map((c) =>
-        c.id === message.conversationId
-          ? {
-              ...c,
-              lastMessage: { content: message.content, createdAt: message.createdAt },
-              unreadCount: active?.id === message.conversationId ? 0 : (c.unreadCount || 0) + 1,
-            }
-          : c
+      conversations: upsertToFrontById(
+        state.conversations,
+        {
+          ...(state.conversations.find((c) => c.id === message.conversationId) || { id: message.conversationId }),
+          lastMessage: { content: message.content, createdAt: message.createdAt },
+          unreadCount: active?.id === message.conversationId || isOwnMessage
+            ? 0
+            : (state.conversations.find((c) => c.id === message.conversationId)?.unreadCount || 0) + 1,
+        }
       ),
     }));
   },

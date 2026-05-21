@@ -48,7 +48,7 @@ const useAuthStore = create(
       // ── Logout ────────────────────────────────────────────────
       logout: async () => {
         const rt = get().refreshToken || localStorage.getItem("refreshToken");
-        try { await authService.logout(rt); } catch (_) {}
+        try { await authService.logout(rt); } catch (error) { void error; }
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false });
@@ -65,7 +65,8 @@ const useAuthStore = create(
         try {
           const res = await authService.getMe();
           set({ user: res.data.user, isAuthenticated: true });
-        } catch {
+        } catch (error) {
+          void error;
           get().logout();
         }
       },

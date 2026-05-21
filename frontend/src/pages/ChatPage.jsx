@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import ChatSidebar from "../components/chat/ChatSidebar";
 import ChatWindow from "../components/chat/ChatWindow";
 import useChatStore from "../store/chatStore";
+import useTranslation from "../hooks/useTranslation";
 
 const ChatPage = () => {
   const { userId } = useParams();
@@ -12,6 +13,7 @@ const ChatPage = () => {
     setActiveConversation,
     openConversationWith,
   } = useChatStore();
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchConversations();
@@ -37,7 +39,7 @@ const ChatPage = () => {
             className="lg:hidden fixed top-16 left-4 z-20 btn-secondary text-xs py-1 px-2"
             onClick={() => setActiveConversation(null)}
           >
-            ← Back
+            ← {t("sidebar.messages")}
           </button>
         )}
       </div>

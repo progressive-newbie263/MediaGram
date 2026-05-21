@@ -59,7 +59,7 @@ const CreatePost = () => {
     <motion.div
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="card p-4 mb-4"
+      className="card p-3 mb-4"
     >
       <div className="flex gap-3">
         <Avatar src={user?.avatar} alt={user?.username} size="md" />
@@ -68,11 +68,11 @@ const CreatePost = () => {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="What's on your mind?"
-            rows={3}
-            className="w-full bg-transparent text-white placeholder-white/30 resize-none focus:outline-none text-[15px] leading-relaxed"
+            rows={1}
+            className="create-post-textarea w-full min-h-[40px] bg-transparent text-white placeholder-white/30 resize-none focus:outline-none text-[15px] leading-normal"
           />
           {previews.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 mt-3">
+            <div className="grid grid-cols-2 gap-2 mt-2">
               {previews.map((src, i) => (
                 <div key={i} className="relative rounded-xl overflow-hidden">
                   <img src={src} alt="" className="w-full h-32 object-cover" />
@@ -81,13 +81,13 @@ const CreatePost = () => {
                     onClick={() => removeImage(i)}
                     className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 text-white text-xs hover:bg-black/80"
                   >
-                    ×
+                    x
                   </button>
                 </div>
               ))}
             </div>
           )}
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5">
             <button
               type="button"
               onClick={() => fileRef.current?.click()}

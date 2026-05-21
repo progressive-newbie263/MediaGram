@@ -2,6 +2,31 @@ const prisma = require("../config/db");
 const { getIO } = require("../config/socket");
 const { uploadToCloudinary } = require("../utils/helpers");
 
+const pickBestConversation = (conversations = []) => {
+  if (!conversations.length) return null;
+
+  return conversations
+    .slice()
+    .sort((a, b) => {
+      const aTime = a.lastMessageAt || a.updatedAt || a.createdAt || new Date(0);
+      const bTime = b.lastMessageAt || b.updatedAt || b.createdAt || new Date(0);
+      return new Date(bTime) - new Date(aTime);
+    })[0];
+};
+
+const formatConversation = (conversation, currentUserId) => {
+  const participant = conversation.participants.find((p) => p.userId !== currentUserId)?.user;
+  const lastMessage = conversation.messages?.[0] || null;
+
+  return {
+    id: conversation.id,
+    participant,
+    lastMessage,
+    lastMessageAt: conversation.lastMessageAt,
+    unreadCount: conversation._count?.messages || 0,
+  };
+};
+
 // ─── Get Conversations ────────────────────────────────────────────
 const getConversations = async (req, res, next) => {
   try {
@@ -30,15 +55,16 @@ const getConversations = async (req, res, next) => {
       orderBy: { lastMessageAt: "desc" },
     });
 
-    const formatted = conversations.map((c) => ({
-      id: c.id,
-      participant: c.participants[0]?.user,
-      lastMessage: c.messages[0] || null,
-      lastMessageAt: c.lastMessageAt,
-      unreadCount: c._count.messages,
-    }));
+    const formatted = conversations.map((c) => formatConversation(c, userId));
+    const unique = Array.from(
+      new Map(
+        formatted
+          .filter((c) => c.participant?.id)
+          .map((c) => [c.participant.id, c])
+      ).values()
+    );
 
-    res.json({ conversations: formatted });
+    res.json({ conversations: unique });
   } catch (err) {
     next(err);
   }
@@ -58,7 +84,7 @@ const getOrCreateConversation = async (req, res, next) => {
     if (!other) return res.status(404).json({ error: "User not found" });
 
     // Check if conversation exists
-    const existing = await prisma.conversation.findFirst({
+    const existingConversations = await prisma.conversation.findMany({
       where: {
         AND: [
           { participants: { some: { userId: currentUserId } } },
@@ -71,8 +97,15 @@ const getOrCreateConversation = async (req, res, next) => {
             user: { select: { id: true, username: true, displayName: true, avatar: true } },
           },
         },
+        messages: {
+          take: 1,
+          orderBy: { createdAt: "desc" },
+          select: { createdAt: true },
+        },
       },
     });
+
+    const existing = pickBestConversation(existingConversations);
 
     if (existing) return res.json({ conversation: existing });
 

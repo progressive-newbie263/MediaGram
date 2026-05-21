@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
 import useNotifStore from "../../store/notifStore";
+import useTranslation from "../../hooks/useTranslation";
 import Avatar from "../common/Avatar";
 import { IconHome, IconSearch, IconBell, IconChat, IconUser } from "../common/Icons";
 
@@ -16,17 +17,20 @@ const Navbar = () => {
   const { user } = useAuthStore();
   const { unreadCount } = useNotifStore();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <>
-      <header className="lg:hidden sticky top-0 z-40 glass border-b border-white/5 px-4 py-3 flex items-center justify-between">
-        <NavLink to="/" className="text-lg font-bold brand-gradient-text">MediaGram</NavLink>
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/5 bg-surface-950/85 px-4 py-3 backdrop-blur-xl lg:hidden">
+        <NavLink to="/" className="font-display text-lg font-bold brand-gradient-text">
+          {t("appName")}
+        </NavLink>
         <button onClick={() => navigate(`/profile/${user?.username}`)}>
           <Avatar src={user?.avatar} alt={user?.username} size="sm" />
         </button>
       </header>
 
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 glass border-t border-white/5 px-2 py-2 safe-area-pb">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/5 bg-surface-950/85 px-2 py-2 backdrop-blur-xl safe-area-pb lg:hidden">
         <div className="flex items-center justify-around">
           {mobileNav.map(({ to, icon: Icon, end, badge, profile }) => (
             <NavLink

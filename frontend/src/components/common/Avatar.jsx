@@ -12,14 +12,16 @@ const Avatar = ({ src, alt = "user", size = "md", online = false, className = ""
 
   return (
     <div className={`relative inline-block flex-shrink-0 ${className}`}>
-      <img
-        src={src || fallback}
-        alt={alt}
-        className={`${sizes[size]} rounded-full object-cover ring-2 ring-surface-800`}
-        onError={(e) => { e.target.src = fallback; }}
-      />
+      <div className={`${sizes[size]} rounded-full overflow-hidden avatar-border`}> 
+        <img
+          src={src || fallback}
+          alt={alt}
+          className="h-full w-full object-cover"
+          onError={(e) => { e.target.src = fallback; }}
+        />
+      </div>
       {online && (
-        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full ring-2 ring-surface-900" />
+        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full ring-2 ring-surface-900 avatar-status-ring" />
       )}
     </div>
   );

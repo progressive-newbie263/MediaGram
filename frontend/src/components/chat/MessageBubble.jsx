@@ -1,15 +1,15 @@
 import Avatar from "../common/Avatar";
-import { formatChatTime } from "../../utils/timeFormat";
+import { formatMessageClock } from "../../utils/timeFormat";
 
 const MessageBubble = ({ message, isOwn }) => (
   <div className={`flex gap-2 mb-3 ${isOwn ? "flex-row-reverse" : ""}`}>
     {!isOwn && <Avatar src={message.sender?.avatar} alt={message.sender?.username} size="sm" />}
     <div className={`max-w-[75%] ${isOwn ? "items-end" : "items-start"} flex flex-col`}>
       <div
-        className={`px-4 py-2.5 rounded-2xl text-sm ${
+        className={`chat-message-bubble px-4 py-2.5 rounded-2xl text-sm border ${
           isOwn
-            ? "bg-brand-500 text-white rounded-br-md"
-            : "bg-surface-800 text-white/90 rounded-bl-md"
+            ? "bg-brand-500 text-white rounded-br-md border-brand-400/20"
+            : "bg-surface-800 text-white/90 rounded-bl-md border-white/5"
         }`}
       >
         {message.image && (
@@ -17,8 +17,8 @@ const MessageBubble = ({ message, isOwn }) => (
         )}
         {message.content && <p className="whitespace-pre-wrap break-words">{message.content}</p>}
       </div>
-      <span className="text-[10px] text-white/30 mt-1 px-1">
-        {formatChatTime(message.createdAt)}
+      <span className={`text-[10px] text-white/30 mt-1 px-1 ${isOwn ? "self-end" : "self-start"}`}>
+        {formatMessageClock(message.createdAt)}
         {isOwn && message.read && " · Seen"}
       </span>
     </div>

@@ -8,6 +8,18 @@ import useChatStore from "../../store/chatStore";
 import { getSocket } from "../../hooks/useSocket";
 import { fileToBase64 } from "../../utils/timeFormat";
 import LoadingSpinner from "../common/LoadingSpinner";
+import useTranslation from "../../hooks/useTranslation";
+import { formatChatDaySeparator, isSameChatDay } from "../../utils/timeFormat";
+
+const MessageDateDivider = ({ label }) => (
+  <div className="chat-date-divider my-4 flex items-center gap-3 px-2">
+    <div className="chat-date-divider-line h-px flex-1" />
+    <span className="chat-date-divider-label rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] backdrop-blur">
+      {label}
+    </span>
+    <div className="chat-date-divider-line h-px flex-1" />
+  </div>
+);
 
 const ChatWindow = ({ conversation }) => {
   const { user } = useAuthStore();
@@ -21,6 +33,7 @@ const ChatWindow = ({ conversation }) => {
   const bottomRef = useRef(null);
   const fileRef = useRef(null);
   const typingTimeout = useRef(null);
+  const { t } = useTranslation();
 
   const participant = conversation?.participant;
 
@@ -88,7 +101,7 @@ const ChatWindow = ({ conversation }) => {
   if (!conversation) {
     return (
       <div className="flex-1 flex items-center justify-center text-white/40">
-        <p>Select a conversation to start chatting</p>
+        <p>{t("common.selectConversation", "Select a conversation to start chatting")}</p>
       </div>
     );
   }
@@ -120,12 +133,21 @@ const ChatWindow = ({ conversation }) => {
             onClick={() => fetchMessages(conversation.id, true)}
             className="w-full text-center text-sm text-brand-400 py-2 mb-4"
           >
-            {loadingMessages ? <LoadingSpinner size="sm" /> : "Load older messages"}
+            {loadingMessages ? <LoadingSpinner size="sm" /> : t("common.loadOlderMessages", "Load older messages")}
           </button>
         )}
-        {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} isOwn={msg.senderId === user.id} />
-        ))}
+        {messages.map((msg, index) => {
+          const previousMessage = messages[index - 1];
+          const currentLabel = formatChatDaySeparator(msg.createdAt);
+          const showDivider = !previousMessage || !isSameChatDay(previousMessage.createdAt, msg.createdAt);
+
+          return (
+            <div key={msg.id}>
+              {showDivider && <MessageDateDivider label={currentLabel} />}
+              <MessageBubble message={msg} isOwn={msg.senderId === user.id} />
+            </div>
+          );
+        })}
         {typing && (
           <div className="flex gap-1 px-4 py-2">
             <span className="typing-dot" />
@@ -155,7 +177,7 @@ const ChatWindow = ({ conversation }) => {
                 handleSend();
               }
             }}
-            placeholder="Type a message…"
+            placeholder={t("common.typeMessage", "Type a message…")}
             rows={1}
             className="flex-1 input-field resize-none max-h-32 py-2.5"
           />

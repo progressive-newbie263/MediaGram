@@ -1,19 +1,21 @@
 import Avatar from "../common/Avatar";
 import { formatChatTime, truncate } from "../../utils/timeFormat";
 import useChatStore from "../../store/chatStore";
+import useTranslation from "../../hooks/useTranslation";
 
 const ChatSidebar = ({ activeId, onSelect }) => {
   const { conversations, isOnline } = useChatStore();
+  const { t } = useTranslation();
 
   return (
     <div className="w-full lg:w-80 border-r border-white/5 flex flex-col h-full">
       <div className="p-4 border-b border-white/5">
-        <h2 className="text-xl font-bold">Messages</h2>
+        <h2 className="text-xl font-bold">{t("sidebar.messages")}</h2>
       </div>
       <div className="flex-1 overflow-y-auto">
         {conversations.length === 0 ? (
           <p className="text-white/40 text-sm text-center py-8 px-4">
-            No conversations yet. Message someone from their profile!
+            {t("common.noConversations", "No conversations yet. Message someone from their profile!")}
           </p>
         ) : (
           conversations.map((conv) => (
@@ -44,7 +46,7 @@ const ChatSidebar = ({ activeId, onSelect }) => {
                 <p className="text-white/40 text-xs truncate">
                   {conv.lastMessage?.content
                     ? truncate(conv.lastMessage.content, 40)
-                    : "Start a conversation"}
+                    : t("common.startConversation", "Start a conversation")}
                 </p>
               </div>
               {conv.unreadCount > 0 && (

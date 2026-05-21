@@ -6,6 +6,7 @@ import Avatar from "../components/common/Avatar";
 import { PostSkeleton } from "../components/common/LoadingSpinner";
 import usePostStore from "../store/postStore";
 import { searchService } from "../services/search.service";
+import useTranslation from "../hooks/useTranslation";
 
 const ExplorePage = () => {
   const [params] = useSearchParams();
@@ -15,6 +16,7 @@ const ExplorePage = () => {
   const [searchResults, setSearchResults] = useState({ users: [], posts: [] });
   const [trending, setTrending] = useState([]);
   const [searching, setSearching] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchExplore(true);
@@ -50,11 +52,11 @@ const ExplorePage = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <header className="sticky top-0 z-30 glass border-b border-white/5 px-4 py-4">
-        <h1 className="text-xl font-bold mb-3">Explore</h1>
+        <h1 className="text-xl font-bold mb-3">{t("sidebar.explore")}</h1>
         <form onSubmit={handleSearch}>
           <input
             className="input-field"
-            placeholder="Search users, posts, #hashtags…"
+            placeholder={t("explore.searchPlaceholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -69,7 +71,7 @@ const ExplorePage = () => {
             <>
               {searchResults.users?.length > 0 && (
                 <section className="mb-6">
-                  <h2 className="font-semibold mb-3 text-white/70">People</h2>
+                  <h2 className="font-semibold mb-3 text-white/70">{t("explore.people")}</h2>
                   {searchResults.users.map((u) => (
                     <Link
                       key={u.id}
@@ -89,7 +91,7 @@ const ExplorePage = () => {
                 <PostCard key={post.id} post={post} />
               ))}
               {!searchResults.users?.length && !searchResults.posts?.length && (
-                <p className="text-white/40 text-center py-8">No results for &quot;{query}&quot;</p>
+                <p className="text-white/40 text-center py-8">{t("explore.noResults")} &quot;{query}&quot;</p>
               )}
             </>
           )
@@ -97,7 +99,7 @@ const ExplorePage = () => {
           <>
             {trending.length > 0 && (
               <div className="card p-4 mb-4">
-                <h2 className="font-semibold mb-3">Trending hashtags</h2>
+                <h2 className="font-semibold mb-3">{t("explore.trendingHashtags")}</h2>
                 <div className="flex flex-wrap gap-2">
                   {trending.map(({ tag, count }) => (
                     <Link

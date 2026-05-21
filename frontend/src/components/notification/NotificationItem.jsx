@@ -1,18 +1,19 @@
 import { Link } from "react-router-dom";
 import Avatar from "../common/Avatar";
 import { timeAgo } from "../../utils/timeFormat";
-
-const messages = {
-  LIKE: "liked your post",
-  COMMENT: "commented on your post",
-  REPLY: "replied to your comment",
-  FOLLOW: "started following you",
-  MENTION: "mentioned you",
-};
+import useTranslation from "../../hooks/useTranslation";
 
 const NotificationItem = ({ notification }) => {
   const { actor, type, post, read, createdAt } = notification;
-  const text = messages[type] || "interacted with you";
+  const { t } = useTranslation();
+  const messages = {
+    LIKE: t("notification.liked", "liked your post"),
+    COMMENT: t("notification.commented", "commented on your post"),
+    REPLY: t("notification.replied", "replied to your comment"),
+    FOLLOW: t("notification.followed", "started following you"),
+    MENTION: t("notification.mentioned", "mentioned you"),
+  };
+  const text = messages[type] || t("notification.generic", "interacted with you");
 
   const content = (
     <div

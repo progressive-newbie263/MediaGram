@@ -28,6 +28,18 @@ export const IconUser = ({ className = "w-6 h-6" }) => (
   </svg>
 );
 
+export const IconSettings = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.8}
+      d="M10.325 4.317a1.75 1.75 0 013.35 0l.286.91a1.75 1.75 0 001.66 1.198l.954.02a1.75 1.75 0 011.54 2.805l-.52.802a1.75 1.75 0 000 1.881l.52.802a1.75 1.75 0 01-1.54 2.806l-.954.02a1.75 1.75 0 00-1.66 1.197l-.286.91a1.75 1.75 0 01-3.35 0l-.286-.91a1.75 1.75 0 00-1.66-1.197l-.954-.02a1.75 1.75 0 01-1.54-2.806l.52-.802a1.75 1.75 0 000-1.881l-.52-.802a1.75 1.75 0 011.54-2.805l.954-.02a1.75 1.75 0 001.66-1.198l.286-.91z"
+    />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" />
+  </svg>
+);
+
 export const IconHeart = ({ className = "w-5 h-5", filled = false }) => (
   <svg className={className} fill={filled ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -59,7 +71,7 @@ export const IconMore = ({ className = "w-5 h-5" }) => (
 );
 
 export const IconVerified = ({ className = "w-4 h-4" }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="#6366f1">
+  <svg className={className} viewBox="0 0 24 24" fill="#3b82f6">
     <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
   </svg>
 );
